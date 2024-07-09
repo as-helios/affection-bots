@@ -74,7 +74,7 @@ while True:
                 pdai_address,
                 buy_with_amount_pls
             )
-            # broadcast swap pls for pusdc
+            # broadcast swap pls for pdai
             if swap_tokens(
                 account,
                 'PulseX_v2',
@@ -102,7 +102,7 @@ while True:
                 pusdc_address,
                 buy_with_amount_pls
             )
-            # broadcast swap pls for pdai
+            # broadcast swap pls for pusdc
             if swap_tokens(
                 account,
                 'PulseX_v2',
