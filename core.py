@@ -273,13 +273,6 @@ def convert_tokens_multi(account, multi_address, token0_address, token1_address,
     return True
 
 
-def log_end_loop(delay):
-    if delay:
-        logging.info("Waiting for {} seconds...".format(delay))
-        time.sleep(delay)
-    logging.info("-" * 50)
-
-
 def estimate_swap_result(router_name, token0_address, token1_address, token0_amount, attempts=18):
     routers = json.load(open('./data/routers.json'))
     router_contract = load_contract(routers[router_name][0], routers[router_name][1])
@@ -297,15 +290,6 @@ def estimate_swap_result(router_name, token0_address, token1_address, token0_amo
         else:
             return expected_output_amounts
     return []
-
-
-def interpret_exception_message(e):
-    logging.debug(e)
-    if 'insufficient funds for gas * price + value' in str(e):
-        return 'Not enough PLS'
-    elif 'transfer amount exceeds balance' in str(e):
-        return 'Not enough tokens'
-    return e
 
 
 def from_token_decimals(amount, decimals):
@@ -412,16 +396,16 @@ def get_last_block_base_fee():
     return float(round(web3.from_wei(base_fee, 'gwei'), 2))
 
 
+def get_nonce(address):
+    return web3.eth.get_transaction_count(web3.to_checksum_address(address))
+
+
 def get_pls_balance(address, decimals=False):
     balance = web3.eth.get_balance(address)
     if decimals:
         return balance
     else:
         return from_token_decimals(balance, 18)
-
-
-def get_nonce(address):
-    return web3.eth.get_transaction_count(web3.to_checksum_address(address))
 
 
 def get_token_balance(token_address, wallet_address, decimals=False):
@@ -475,6 +459,15 @@ def get_token_info(token_address, attempts=18):
     return token_info
 
 
+def interpret_exception_message(e):
+    logging.debug(e)
+    if 'insufficient funds for gas * price + value' in str(e):
+        return 'Not enough PLS'
+    elif 'transfer amount exceeds balance' in str(e):
+        return 'Not enough tokens'
+    return e
+
+
 def load_contract(address, abi=None):
     if not abi:
         abi = load_contract_abi(address)
@@ -507,6 +500,13 @@ def load_wallet(address, secret):
     keystore = "\n".join([line.strip() for line in open(file_path, 'r+')])
     private_key = web3.eth.account.decrypt(keystore, secret)
     return web3.eth.account.from_key(private_key)
+
+
+def log_end_loop(delay):
+    if delay:
+        logging.info("Waiting for {} seconds...".format(delay))
+        time.sleep(delay)
+    logging.info("-" * 50)
 
 
 def mint_tokens(account, token_address, amount, attempts=18):
@@ -673,6 +673,20 @@ def to_token_decimals(amount, decimals):
     return int(str(amount).replace('.', '') + '0' * decimals)
 
 
+def unwrap_pls(account, amount, attempts=18):
+    wpls_contract = load_contract("0xA1077a294dDE1B09bB078844df40758a5D0f9a27")
+    tx = wpls_contract.functions.withdraw(to_token_decimals(amount, 18)).build_transaction({
+        "from": account.address,
+        "nonce": get_nonce(account.address)
+    })
+    try:
+        return broadcast_transaction(account, tx, True, attempts)
+    except Exception as e:
+        if error := interpret_exception_message(e):
+            logging.error("{} to unwrap PLS".format(error))
+        return False
+
+
 def wrap_pls(account, amount, attempts=18):
     wpls_contract = load_contract("0xA1077a294dDE1B09bB078844df40758a5D0f9a27")
     tx = wpls_contract.functions.deposit().build_transaction({
@@ -687,16 +701,3 @@ def wrap_pls(account, amount, attempts=18):
             logging.error("{} to wrap PLS".format(error))
         return False
 
-
-def unwrap_pls(account, amount, attempts=18):
-    wpls_contract = load_contract("0xA1077a294dDE1B09bB078844df40758a5D0f9a27")
-    tx = wpls_contract.functions.withdraw(to_token_decimals(amount, 18)).build_transaction({
-        "from": account.address,
-        "nonce": get_nonce(account.address)
-    })
-    try:
-        return broadcast_transaction(account, tx, True, attempts)
-    except Exception as e:
-        if error := interpret_exception_message(e):
-            logging.error("{} to unwrap PLS".format(error))
-        return False
