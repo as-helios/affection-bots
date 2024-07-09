@@ -387,7 +387,7 @@ def get_beacon_gas_prices(speed=None, cache_interval_seconds=5):
             return float(web3.from_wei(gas['data'][speed], 'gwei'))
         except KeyError:
             raise KeyError("No such speed as '{}' in gas price data {}".format(speed, list(speeds)))
-    return {speed:float(web3.from_wei(price, 'gwei')) for speed,price in gas['data'].items() if speed in speeds}
+    return {speed: float(web3.from_wei(price, 'gwei')) for speed, price in gas['data'].items() if speed in speeds}
 
 
 def get_last_block_base_fee():
@@ -676,11 +676,11 @@ def to_token_decimals(amount, decimals):
 
 def unwrap_pls(account, amount, attempts=18):
     wpls_contract = load_contract("0xA1077a294dDE1B09bB078844df40758a5D0f9a27")
-    tx = wpls_contract.functions.withdraw(to_token_decimals(amount, 18)).build_transaction({
-        "from": account.address,
-        "nonce": get_nonce(account.address)
-    })
     try:
+        tx = wpls_contract.functions.withdraw(to_token_decimals(amount, 18)).build_transaction({
+            "from": account.address,
+            "nonce": get_nonce(account.address)
+        })
         return broadcast_transaction(account, tx, True, attempts)
     except Exception as e:
         if error := interpret_exception_message(e):
@@ -690,12 +690,12 @@ def unwrap_pls(account, amount, attempts=18):
 
 def wrap_pls(account, amount, attempts=18):
     wpls_contract = load_contract("0xA1077a294dDE1B09bB078844df40758a5D0f9a27")
-    tx = wpls_contract.functions.deposit().build_transaction({
-        "from": account.address,
-        "nonce": get_nonce(account.address),
-        "value": to_token_decimals(amount, 18)
-    })
     try:
+        tx = wpls_contract.functions.deposit().build_transaction({
+            "from": account.address,
+            "nonce": get_nonce(account.address),
+            "value": to_token_decimals(amount, 18)
+        })
         return broadcast_transaction(account, tx, True, attempts)
     except Exception as e:
         if error := interpret_exception_message(e):
