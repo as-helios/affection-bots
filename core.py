@@ -61,15 +61,15 @@ def approve_token_spending(account, token_address, spender_address, amount, atte
     token_info = get_token_info(token_address)
     token_amount = to_token_decimals(amount, token_info['decimals'])
     if token_contract.functions.allowance(account.address, spender_address).call() < token_amount:
-        tx = token_contract.functions.approve(spender_address, token_amount).build_transaction({
-            'nonce': get_nonce(account.address),
-            'from': account.address
-        })
         try:
+            tx = token_contract.functions.approve(spender_address, token_amount).build_transaction({
+                'nonce': get_nonce(account.address),
+                'from': account.address
+            })
             return broadcast_transaction(account, tx, True, attempts)
         except Exception as e:
             if error := interpret_exception_message(e):
-                logging.error("{} to approve {} ({})".format(error, token_info['name'], token_info['symbol']))
+                logging.error("{}. Failed to approve {} ({})".format(error, token_info['name'], token_info['symbol']))
             return False
 
 
