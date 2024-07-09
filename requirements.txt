@@ -1,0 +1,4 @@
+python-dotenv
+web3
+web3_multi_provider
+requests

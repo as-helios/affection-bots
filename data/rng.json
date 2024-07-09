@@ -1,0 +1,40 @@
+{
+  "0xa96BcbeD7F01de6CEEd14fC86d90F21a36dE2143": {
+    "functions": {
+      "Generate": null
+    },
+    "label": "RNG 1"
+  },
+  "0x2b943Bf3cFc3B7A42DC7d13898171802BCD3Aea9": {
+    "functions": {
+      "Generate": null
+    },
+    "label": "RNG 2"
+  },
+  "0x17E136fD4c821ae25A611fAF187753B6e84736a4": {
+    "functions": {
+      "Generate": null
+    },
+    "label": "RNG 3"
+  },
+  "0x5EF3011243B03f817223A19f277638397048A0DC": {
+    "functions": {
+      "Random": null
+    },
+    "label": "MATH v1.0"
+  },
+  "0xB680F0cc810317933F234f67EB6A9E923407f05D": {
+    "functions": {
+      "Random": null
+    },
+    "label": "MATH v1.1"
+  },
+  "0x24F0154C1dCe548AdF15da2098Fdd8B8A3B8151D": {
+    "functions": {
+      "Generate": null,
+      "Pi": null,
+      "Rho": null
+    },
+    "label": "AFFECTION™"
+  }
+}
