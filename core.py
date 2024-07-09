@@ -516,7 +516,8 @@ def mint_tokens(account, token_address, amount, attempts=18):
     call_function = random.choice(list(rng_functions[token_address]['functions']))
     token_contract = load_contract(token_address, load_contract_abi(token_address))
     token_info = get_token_info(token_address)
-    for i in list(range(0, int(amount))):
+    loops = math.ceil(amount / rng_functions[token_address]['mints'])
+    for i in list(range(0, loops)):
         tx = getattr(token_contract.functions, call_function)().build_transaction({
             "from": account.address,
             "nonce": get_nonce(account.address)
