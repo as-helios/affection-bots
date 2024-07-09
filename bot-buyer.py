@@ -83,6 +83,10 @@ while True:
                 slippage_percent
             ):
                 logging.info("Swapped {} PLS to pDAI".format(buy_with_amount_pls))
+        else:
+            logging.info("pDAI is not within range to buy yet ({}%)".format(buy_percent_diff_pdai))
+    else:
+        logging.info("pDAI is not cheaper than AFFECTION™ yet".format(buy_percent_diff_pdai))
 
     # check if the pusdc price is cheaper than affection price
     if pusdc_sample_result < affection_sample_result:
@@ -107,6 +111,11 @@ while True:
                 slippage_percent
             ):
                 logging.info("Swapped {} PLS to pUSDC".format(buy_with_amount_pls))
+        else:
+            logging.info("pUSDC is not within range to buy yet ({}%)".format(buy_percent_diff_pusdc))
+    else:
+        logging.info("pUSDC is not cheaper than AFFECTION™ yet".format(buy_percent_diff_pdai))
 
     # wait before next loop
     log_end_loop(loop_delay)
+
