@@ -63,34 +63,45 @@ while True:
     logging.info("AFFECTION™ Balance: {:.15f}".format(affection_balance := get_token_balance(affection_address, wallet_c_address), 2))
     # check if wallet c has at least 1 token to sell
     if affection_balance > 1:
-        # get amounts of affection to sell
-        sells = math.floor(affection_balance / sell_with_amount_affection)
-        selling_amounts = [sell_with_amount_affection] * sells
-        selling_amounts.append(math.floor(affection_balance - sum(selling_amounts)))
-        # start selling affection in different amounts
-        logging.info("Selling {} AFFECTION™...".format(sum(selling_amounts)))
-        for i, amount in enumerate(selling_amounts):
-            estimated_swap_result = estimate_swap_result(
-                'PulseX_v2',
-                affection_address,
-                wpls_address,
-                amount
-            )
-            if swap_tokens(
-                account,
-                'PulseX_v2',
-                [affection_address, wpls_address],
-                estimated_swap_result,
-                slippage_percent
-            ):
-                logging.info("Swapped {} AFFECTION™ to PLS".format(amount))
-            # delay if amounts remain in the list
-            if i + 1 != len(selling_amounts):
-                logging.info("Waiting for {} seconds...".format(loop_sell_delay))
-                time.sleep(loop_sell_delay)
+        # check if the affection price spiked since last time
+        if not sell_percent_diff_affection or affection_sample_result > affection_sample_result_last:
+            # check the percent difference
+            percent_diff = ((affection_sample_result_last - affection_sample_result) / affection_sample_result) * 100
+            # sell if percent is met
+            if not sell_percent_diff_affection or (percent_diff < 0 and abs(percent_diff) >= sell_percent_diff_affection):
+                # get amounts of affection to sell
+                sells = math.floor(affection_balance / sell_with_amount_affection)
+                selling_amounts = [sell_with_amount_affection] * sells
+                selling_amounts.append(math.floor(affection_balance - sum(selling_amounts)))
+                # start selling affection in different amounts
+                logging.info("Selling {} AFFECTION™...".format(sum(selling_amounts)))
+                for i, amount in enumerate(selling_amounts):
+                    estimated_swap_result = estimate_swap_result(
+                        'PulseX_v2',
+                        affection_address,
+                        wpls_address,
+                        amount
+                    )
+                    if swap_tokens(
+                        account,
+                        'PulseX_v2',
+                        [affection_address, wpls_address],
+                        estimated_swap_result,
+                        slippage_percent
+                    ):
+                        logging.info("Swapped {} AFFECTION™ to PLS".format(amount))
+                    # delay if amounts remain in the list
+                    if i + 1 != len(selling_amounts):
+                        logging.info("Waiting for {} seconds...".format(loop_sell_delay))
+                        time.sleep(loop_sell_delay)
+            else:
+                logging.info("AFFECTION™ is not within range to sell yet ({}%)".format(sell_percent_diff_affection))
+        else:
+            logging.info("AFFECTION™ price hasn't increased yet")
 
     # save the last sample price
     affection_sample_result_last = affection_sample_result
 
     # wait before next loop
     log_end_loop(loop_delay)
+
