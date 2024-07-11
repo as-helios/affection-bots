@@ -418,16 +418,6 @@ def get_token_balance(token_address, wallet_address, decimals=False):
         return float(round(from_token_decimals(token_balance, token_info['decimals']), 15))
 
 
-def get_token_supply(token_address, decimals=False):
-    token_contract = load_contract(token_address)
-    token_info = get_token_info(token_address)
-    token_supply = token_contract.functions.totalSupply().call()
-    if decimals:
-        return token_supply
-    else:
-        return float(round(from_token_decimals(token_supply, token_info['decimals']), 15))
-
-
 def get_token_info(token_address, attempts=18):
     os.makedirs(token_folder := "./data/tokens".format(token_address), exist_ok=True)
     token_info_file = "{}/{}.json".format(token_folder, token_address)
@@ -467,6 +457,16 @@ def get_token_info(token_address, attempts=18):
     token_info = {"name": token_name, "symbol": token_symbol, "decimals": token_decimals}
     open(token_info_file, 'w').write(json.dumps(token_info, indent=4))
     return token_info
+
+
+def get_token_supply(token_address, decimals=False):
+    token_contract = load_contract(token_address)
+    token_info = get_token_info(token_address)
+    token_supply = token_contract.functions.totalSupply().call()
+    if decimals:
+        return token_supply
+    else:
+        return float(round(from_token_decimals(token_supply, token_info['decimals']), 15))
 
 
 def interpret_exception_message(e):
