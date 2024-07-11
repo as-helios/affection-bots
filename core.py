@@ -413,17 +413,17 @@ def get_token_balance(token_address, wallet_address, decimals=False):
     token_info = get_token_info(token_address)
     token_balance = token_contract.functions.balanceOf(wallet_address).call()
     if decimals:
-        return round(token_balance, 15)
+        return token_balance
     else:
         return float(round(from_token_decimals(token_balance, token_info['decimals']), 15))
-        
-        
+
+
 def get_token_supply(token_address, decimals=False):
     token_contract = load_contract(token_address)
     token_info = get_token_info(token_address)
     token_supply = token_contract.functions.totalSupply().call()
     if decimals:
-        return round(token_supply, 15)
+        return token_supply
     else:
         return float(round(from_token_decimals(token_supply, token_info['decimals']), 15))
 
