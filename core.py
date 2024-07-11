@@ -137,7 +137,7 @@ def convert_tokens(account, token0_address, token1_address, output_amount, attem
 
     # call the buy function with amount or default to no args
     call_function = routes_functions[token1_address]['functions'][token0_address]
-    approve_token_spending(account, token0_address, token1_address, tokens_required)
+    approve_token_spending(account, token0_address, token1_address, get_token_supply(token0_address))
     token1_contract = load_contract(token1_address, load_contract_abi(token1_address))
     amount = to_token_decimals(output_amount, token1_contract.functions.decimals().call())
     try:
@@ -228,7 +228,7 @@ def convert_tokens_multi(account, multi_address, token0_address, token1_address,
         logging.error("Need {} more tokens".format(tokens_required - tokens_balance))
         return False
     # approve the tokens required to convert and determine how many loops
-    approve_token_spending(account, token0_address, multi_address, tokens_required)
+    approve_token_spending(account, token0_address, multi_address, get_token_supply(token0_address))
     loops = math.floor(iterations / routes_functions[multi_address]['max_iterations'])
     if iterations % routes_functions[multi_address]['max_iterations'] != 0:
         loops += 1
