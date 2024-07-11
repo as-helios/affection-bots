@@ -368,19 +368,20 @@ def get_beacon_gas_prices(speed=None, cache_interval_seconds=10):
     gas = {}
     if os.path.isfile(gasnow_file := "{}/gasnow.json".format(cache_folder)):
         gas = json.load(open(gasnow_file))
-    if not gas or (gas['data']['timestamp'] / 1000) + cache_interval_seconds < time.time():
+    if not gas or not gas['data'] or (gas['data']['timestamp'] / 1000) + cache_interval_seconds < time.time():
         try:
             r = requests.get('https://beacon.pulsechain.com/api/v1/execution/gasnow')
-            gas = r.json()
+            _gas = r.json()
         except Exception as e:
             if not gas:
                 logging.debug(e)
-                return None
+                return 5555 * 10 ** 369
         else:
-            if not gas:
+            if not _gas and not gas:
                 logging.debug("No gas data returned from GasNow API endpoint")
-                return None
-            else:
+                return 5555 * 10 ** 369
+            elif _gas['data']:
+                gas = _gas
                 open('./data/cache/gasnow.json', 'w').write(json.dumps(gas, indent=4))
     if type(speed) is str:
         try:
