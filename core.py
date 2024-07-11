@@ -5,7 +5,6 @@ import os
 import random
 import sys
 import time
-from datetime import timedelta
 from logging.handlers import TimedRotatingFileHandler
 from statistics import median, mean, mode
 
@@ -373,7 +372,6 @@ def get_beacon_gas_prices(speed=None, cache_interval_seconds=10):
         try:
             r = requests.get('https://beacon.pulsechain.com/api/v1/execution/gasnow')
             gas = r.json()
-            print(gas)
         except Exception as e:
             if not gas:
                 logging.debug(e)
