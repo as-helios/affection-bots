@@ -5,6 +5,7 @@ import os
 import random
 import sys
 import time
+from datetime import timedelta
 from logging.handlers import TimedRotatingFileHandler
 from statistics import median, mean, mode
 
@@ -362,16 +363,17 @@ def get_average_gas_prices(average='median', tx_amount=100):
     }
 
 
-def get_beacon_gas_prices(speed=None, cache_interval_seconds=5):
+def get_beacon_gas_prices(speed=None, cache_interval_seconds=10):
     speeds = ('rapid', 'fast', 'standard', 'slow',)
     os.makedirs(cache_folder := './data/cache/', exist_ok=True)
     gas = {}
     if os.path.isfile(gasnow_file := "{}/gasnow.json".format(cache_folder)):
         gas = json.load(open(gasnow_file))
-    if not gas or gas['data']['timestamp'] + cache_interval_seconds < time.time():
+    if not gas or (gas['data']['timestamp'] / 1000) + cache_interval_seconds < time.time():
         try:
             r = requests.get('https://beacon.pulsechain.com/api/v1/execution/gasnow')
             gas = r.json()
+            print(gas)
         except Exception as e:
             if not gas:
                 logging.debug(e)
