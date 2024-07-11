@@ -86,6 +86,13 @@ while True:
         logging.info("Converting {} MATH v1.1 to AFFECTION™...".format(loops * 3))
         convert_tokens_multi(account, multi_affection_address, math11_address, affection_address, loops)
 
+    # transfer affection
+    logging.info("AFFECTION™ Balance: {:.15f}".format(affection_balance := float(round(get_token_balance(affection_address, wallet_b_address), 2))))
+    if affection_balance > 1:
+        # send affection tokens to wallet C for selling
+        if send_tokens(account, affection_address, wallet_c_address, affection_balance):
+            logging.info("Sent {} AFFECTION™ to {}".format(affection_balance, wallet_c_address))
+
     # convert pdai to pi
     logging.info("pDAI Balance: {:.15f}".format(pdai_balance := get_token_balance(pdai_address, wallet_b_address)))
     if (loops := math.floor(pdai_balance / 300)) != 0:
