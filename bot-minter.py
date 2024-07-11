@@ -3,7 +3,7 @@ from core import *
 # set config variables
 wallet_min_pls = 20000
 loop_delay = 3
-rapid_gas_fee_limit = 650000
+rapid_gas_fee_limit = 600000
 
 # load wallet B and set address for logging
 set_logging(wallet_b_address, 'INFO')
@@ -68,6 +68,24 @@ while True:
         log_end_loop(loop_delay)
         continue
 
+    # convert pi to affection
+    logging.info("PI Balance: {:.15f}".format(pi_balance := get_token_balance(pi_address, wallet_b_address)))
+    if (loops := math.floor(pi_balance / 0.01)) != 0:
+        logging.info("Converting {} PI to AFFECTION™...".format(loops * 0.01))
+        convert_tokens_multi(account, multi_affection_address, pi_address, affection_address, loops)
+
+    # convert g5 to affection
+    logging.info("G5 Balance: {:.15f}".format(g5_balance := get_token_balance(g5_address, wallet_b_address)))
+    if (loops := math.floor(g5_balance / 0.6)) != 0:
+        logging.info("Converting {} G5 to AFFECTION™...".format(loops * 0.6))
+        convert_tokens_multi(account, multi_affection_address, g5_address, affection_address, loops)
+
+    # convert math 1.1 to affection
+    logging.info("MATH 1.1 Balance: {:.15f}".format(math11_balance := get_token_balance(math11_address, wallet_b_address)))
+    if (loops := math.floor(math11_balance / 3)) != 0:
+        logging.info("Converting {} MATH v1.1 to AFFECTION™...".format(loops * 3))
+        convert_tokens_multi(account, multi_affection_address, math11_address, affection_address, loops)
+
     # convert pdai to pi
     logging.info("pDAI Balance: {:.15f}".format(pdai_balance := get_token_balance(pdai_address, wallet_b_address)))
     if (loops := math.floor(pdai_balance / 300)) != 0:
@@ -92,23 +110,6 @@ while True:
         logging.info("Converting {} pUSDC to MATH v1.1 ...".format(loops))
         convert_tokens_multi(account, multi_math_1_1_address, pusdc_address, math11_address, loops)
 
-    # convert pi to affection
-    logging.info("PI Balance: {:.15f}".format(pi_balance := get_token_balance(pi_address, wallet_b_address)))
-    if (loops := math.floor(pi_balance / 0.01)) != 0:
-        logging.info("Converting {} PI to AFFECTION™...".format(loops * 0.01))
-        convert_tokens_multi(account, multi_affection_address, pi_address, affection_address, loops)
-
-    # convert g5 to affection
-    logging.info("G5 Balance: {:.15f}".format(g5_balance := get_token_balance(g5_address, wallet_b_address)))
-    if (loops := math.floor(g5_balance / 0.6)) != 0:
-        logging.info("Converting {} G5 to AFFECTION™...".format(loops * 0.6))
-        convert_tokens_multi(account, multi_affection_address, g5_address, affection_address, loops)
-
-    # convert math 1.1 to affection
-    logging.info("MATH 1.1 Balance: {:.15f}".format(math11_balance := get_token_balance(math11_address, wallet_b_address)))
-    if (loops := math.floor(math11_balance / 3)) != 0:
-        logging.info("Converting {} MATH v1.1 to AFFECTION™...".format(loops * 3))
-        convert_tokens_multi(account, multi_affection_address, math11_address, affection_address, loops)
-
     # wait before next loop
     log_end_loop(loop_delay)
+
