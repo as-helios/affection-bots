@@ -373,7 +373,7 @@ def get_beacon_gas_prices(speed=None, cache_interval_seconds=10):
             r = requests.get('https://beacon.pulsechain.com/api/v1/execution/gasnow')
             _gas = r.json()
         except Exception as e:
-            if not gas:
+            if not gas or not gas['data']:
                 logging.debug(e)
                 return 5555 * 10 ** 369
         else:
