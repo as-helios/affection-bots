@@ -111,15 +111,13 @@ while True:
                         logging.warning("No estimated swap result from RPC")
                         break
                     # delay if amounts remain in the list
-                    if i <= len(selling_amounts):
+                    if i < len(selling_amounts):
                         logging.info("Waiting for {} seconds...".format(loop_sell_delay))
                         time.sleep(loop_sell_delay)
-                    else:
-                        break
-                    # resample the prices
-                    pdai_sample_result = sample_exchange_rate('PulseX_v2', pdai_address, wpls_address)
-                    pusdc_sample_result = sample_exchange_rate('PulseX_v2', pusdc_address, wpls_address)
-                    affection_sample_result = sample_exchange_rate('PulseX_v2', affection_address, wpls_address)
+                        # resample the prices
+                        pdai_sample_result = sample_exchange_rate('PulseX_v2', pdai_address, wpls_address)
+                        pusdc_sample_result = sample_exchange_rate('PulseX_v2', pusdc_address, wpls_address)
+                        affection_sample_result = sample_exchange_rate('PulseX_v2', affection_address, wpls_address)
                 else:
                     logging.info("AFFECTION™ price is not within targeted range for selling")
                     break
