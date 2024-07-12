@@ -31,7 +31,7 @@ while True:
     # send pls back to wallet a for buying
     pls_balance = get_pls_balance(account.address, False)
     pls_balance -= wallet_min_pls
-    # send the minter 1/3
+    # send the minter 1/4
     send_to_wallet_b = float(round(pls_balance / 4, 2))
     # send the rest to buyer
     send_to_wallet_a = float(round(pls_balance - send_to_wallet_b, 2))
