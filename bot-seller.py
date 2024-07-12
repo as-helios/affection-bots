@@ -2,12 +2,12 @@ from core import *
 
 # set config variables
 sell_percent_diff_affection = 0
-sell_with_amount_affection = 500
+sell_with_amount_affection = 200
 slippage_percent = 5
 wallet_min_pls = 20000
 loop_delay = 3
 loop_sell_delay = 10
-rapid_gas_fee_limit = 777777
+rapid_gas_fee_limit = 650000
 
 # load wallet C and set address for logging
 set_logging(wallet_c_address, 'INFO')

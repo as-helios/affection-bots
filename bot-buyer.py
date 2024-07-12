@@ -3,11 +3,11 @@ from core import *
 # set config variables
 buy_percent_diff_pdai = 20
 buy_percent_diff_pusdc = 30
-buy_with_amount_pls = 30000
+buy_with_amount_pls = 10000
 slippage_percent = 5
 wallet_min_pls = 20000
 loop_delay = 3
-rapid_gas_fee_limit = 777777
+rapid_gas_fee_limit = 650000
 
 # load wallet A and set address for logging
 set_logging(wallet_a_address, 'INFO')
