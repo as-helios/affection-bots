@@ -3,11 +3,11 @@ from core import *
 # set config variables
 buy_percent_diff_pdai = 20
 buy_percent_diff_pusdc = 30
-buy_with_amount_pls = 10000
+buy_with_amount_pls = 30000
 slippage_percent = 5
 wallet_min_pls = 20000
 loop_delay = 3
-rapid_gas_fee_limit = 650000
+rapid_gas_fee_limit = 777777
 
 # load wallet A and set address for logging
 set_logging(wallet_a_address, 'INFO')
@@ -74,15 +74,18 @@ while True:
                 pdai_address,
                 buy_with_amount_pls
             )
-            # broadcast swap pls for pdai
-            if swap_tokens(
-                account,
-                'PulseX_v2',
-                [wpls_address, pdai_address],
-                estimated_swap_result,
-                slippage_percent
-            ):
-                logging.info("Swapped {} PLS to pDAI".format(buy_with_amount_pls))
+            if estimated_swap_result:
+                # broadcast swap pls for pdai
+                if swap_tokens(
+                    account,
+                    'PulseX_v2',
+                    [wpls_address, pdai_address],
+                    estimated_swap_result,
+                    slippage_percent
+                ):
+                    logging.info("Swapped {} PLS to pDAI".format(buy_with_amount_pls))
+            else:
+                logging.warning("No estimated swap result data")
         else:
             logging.info("pDAI is not within range to buy yet ({}%)".format(buy_percent_diff_pdai))
     else:
@@ -102,15 +105,18 @@ while True:
                 pusdc_address,
                 buy_with_amount_pls
             )
-            # broadcast swap pls for pusdc
-            if swap_tokens(
-                account,
-                'PulseX_v2',
-                [wpls_address, pusdc_address],
-                estimated_swap_result,
-                slippage_percent
-            ):
-                logging.info("Swapped {} PLS to pUSDC".format(buy_with_amount_pls))
+            if estimated_swap_result:
+                # broadcast swap pls for pusdc
+                if swap_tokens(
+                    account,
+                    'PulseX_v2',
+                    [wpls_address, pusdc_address],
+                    estimated_swap_result,
+                    slippage_percent
+                ):
+                    logging.info("Swapped {} PLS to pUSDC".format(buy_with_amount_pls))
+            else:
+                logging.warning("No estimated swap result data")
         else:
             logging.info("pUSDC is not within range to buy yet ({}%)".format(buy_percent_diff_pusdc))
     else:

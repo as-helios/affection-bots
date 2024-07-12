@@ -2,12 +2,12 @@ from core import *
 
 # set config variables
 sell_percent_diff_affection = 0
-sell_with_amount_affection = 200
+sell_with_amount_affection = 500
 slippage_percent = 5
 wallet_min_pls = 20000
 loop_delay = 3
 loop_sell_delay = 10
-rapid_gas_fee_limit = 650000
+rapid_gas_fee_limit = 777777
 
 # load wallet C and set address for logging
 set_logging(wallet_c_address, 'INFO')
@@ -31,7 +31,7 @@ while True:
     # send pls back to wallet a for buying
     pls_balance = get_pls_balance(account.address, False)
     pls_balance -= wallet_min_pls
-    # send the minter 1/4
+    # send the minter 1/3
     send_to_wallet_b = float(round(pls_balance / 4, 2))
     # send the rest to buyer
     send_to_wallet_a = float(round(pls_balance - send_to_wallet_b, 2))
@@ -82,14 +82,18 @@ while True:
                         wpls_address,
                         amount
                     )
-                    if swap_tokens(
-                        account,
-                        'PulseX_v2',
-                        [affection_address, wpls_address],
-                        estimated_swap_result,
-                        slippage_percent
-                    ):
-                        logging.info("Swapped {} AFFECTION™ to PLS".format(amount))
+                    if estimated_swap_result:
+                        if swap_tokens(
+                            account,
+                            'PulseX_v2',
+                            [affection_address, wpls_address],
+                            estimated_swap_result,
+                            slippage_percent
+                        ):
+                            logging.info("Swapped {} AFFECTION™ to PLS".format(amount))
+                    else:
+                        logging.warning("No estimated swap result from RPC")
+                        break
                     # delay if amounts remain in the list
                     if i + 1 != len(selling_amounts):
                         logging.info("Waiting for {} seconds...".format(loop_sell_delay))
