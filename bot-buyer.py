@@ -43,6 +43,10 @@ while True:
     pdai_sample_result = sample_exchange_rate('PulseX_v2', pdai_address, wpls_address)
     pusdc_sample_result = sample_exchange_rate('PulseX_v2', pusdc_address, wpls_address)
     affection_sample_result = sample_exchange_rate('PulseX_v2', affection_address, wpls_address)
+    if not pdai_sample_result or not pusdc_sample_result or not affection_sample_result:
+        logging.warning("Failed to sample prices")
+        log_end_loop(loop_delay)
+        continue
 
     # log the current rate
     logging.info("pDAI Rate: 1 = {} PLS".format(pdai_sample_result / 10 ** 18))

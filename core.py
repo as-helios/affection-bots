@@ -30,13 +30,20 @@ wallet_b_address = os.getenv('WALLET_B_ADDRESS')
 wallet_c_address = os.getenv('WALLET_C_ADDRESS')
 
 
-def apply_estimated_gas(tx):
-    if 'gas' not in tx:
-        tx['gas'] = web3.eth.estimate_gas(tx)
-    return tx
+def apply_estimated_gas(tx, attempts=18):
+    while attempts > 0:
+        try:
+            if 'gas' not in tx:
+                tx['gas'] = web3.eth.estimate_gas(tx)
+        except Exception as e:
+            logging.debug(e)
+            attempts -= 1
+            time.sleep(1)
+        else:
+            return tx
 
 
-def apply_gas_multiplier(tx, multiplier=None):
+def apply_gas_multiplier(tx, multiplier=None, attempts=18):
     if not multiplier:
         multiplier = os.getenv('GAS_MULTIPLIER')
     try:
@@ -104,9 +111,12 @@ def broadcast_transaction(account, tx, auto_gas=True, attempts=18):
                 continue
             elif "already known" in str(e):
                 pass
+            else:
+                _attempts -= 1
+                time.sleep(1)
         if not tx_hash:
-            time.sleep(10)
             _attempts -= 1
+            time.sleep(1)
             if _attempts != 0:
                 logging.debug("Rebroadcasting TX ... {}".format(attempts - _attempts))
             continue
@@ -116,11 +126,13 @@ def broadcast_transaction(account, tx, auto_gas=True, attempts=18):
             except Exception as e:
                 logging.debug(e)
                 _attempts -= 1
+                time.sleep(1)
                 if _attempts != 0:
                     logging.debug("Rebroadcasting TX ... {}".format(attempts - _attempts))
             else:
                 logging.debug("Confirmed TX: {}".format(tx_receipt))
                 return tx_receipt
+    return False
 
 
 def convert_tokens(account, token0_address, token1_address, output_amount, attempts=18):
@@ -278,8 +290,7 @@ def estimate_swap_result(router_name, token0_address, token1_address, token0_amo
     routers = json.load(open('./data/routers.json'))
     router_contract = load_contract(routers[router_name][0], routers[router_name][1])
     token0_info = get_token_info(token0_address)
-    _attempts = attempts
-    while _attempts > 0:
+    while attempts > 0:
         try:
             expected_output_amounts = router_contract.functions.getAmountsOut(
                 int(token0_amount * 10 ** token0_info['decimals']),
@@ -287,7 +298,8 @@ def estimate_swap_result(router_name, token0_address, token1_address, token0_amo
             ).call()
         except Exception as e:
             logging.debug(e)
-            _attempts -= 1
+            attempts -= 1
+            time.sleep(1)
         else:
             return expected_output_amounts
     return []
@@ -311,14 +323,13 @@ def generate_wallet(amount):
 
 
 def get_abi_from_blockscout(address, attempts=18):
-    _attempts = attempts
-    while _attempts > 0:
+    while attempts > 0:
         try:
             r = requests.get("https://api.scan.pulsechain.com/api/v2/smart-contracts/{}".format(address))
             r.raise_for_status()
         except RequestException:
-            _attempts -= 1
-            if _attempts > 0:
+            attempts -= 1
+            if attempts > 0:
                 time.sleep(1)
                 continue
             else:
@@ -331,15 +342,38 @@ def get_abi_from_blockscout(address, attempts=18):
                 return []
 
 
-def get_average_gas_prices(average='median', tx_amount=100):
-    latest_block = web3.eth.get_block('latest')['number']
+def get_average_gas_prices(average='median', tx_amount=100, attempts=18):
+    latest_block = None
+    _attempts = attempts
+    while _attempts > 0:
+        try:
+            latest_block = web3.eth.get_block('latest')['number']
+        except Exception as e:
+            logging.debug(e)
+            _attempts -= 1
+            time.sleep(1)
+        else:
+            break
+    if not latest_block:
+        return {}
     gas_limit = []
     gas_prices = []
     for block_number in range(latest_block, latest_block - tx_amount, -1):
-        try:
-            block = web3.eth.get_block(block_number, full_transactions=True)
-        except BlockNotFound:
-            continue
+        block = None
+        _attempts = attempts
+        while _attempts > 0:
+            try:
+                block = web3.eth.get_block(block_number, full_transactions=True)
+            except BlockNotFound:
+                continue
+            except Exception as e:
+                logging.debug(e)
+                _attempts -= 1
+                time.sleep(1)
+            else:
+                break
+        if not block:
+            return {}
         for _tx in block['transactions']:
             gas_limit.append(_tx['gas'])
             gas_prices.append(_tx['gasPrice'])
@@ -356,7 +390,7 @@ def get_average_gas_prices(average='median', tx_amount=100):
             average_gas_limit = mode(gas_limit[:tx_amount])
             average_gas_price = mode(gas_prices[:tx_amount])
         case _:
-            return None
+            raise Exception('Invalid average type')
     return {
         "gas_limit": average_gas_limit,
         "gas_price": average_gas_price
@@ -394,22 +428,45 @@ def get_beacon_gas_prices(speed=None, cache_interval_seconds=10):
     return {speed: float(web3.from_wei(price, 'gwei')) for speed, price in gas['data'].items() if speed in speeds}
 
 
-def get_last_block_base_fee():
-    latest_block = web3.eth.get_block('latest')
-    base_fee = latest_block['baseFeePerGas']
-    return float(round(web3.from_wei(base_fee, 'gwei'), 2))
+def get_last_block_base_fee(attempts=18):
+    while attempts > 0:
+        try:
+            latest_block = web3.eth.get_block('latest')
+        except Exception as e:
+            logging.debug(e)
+            time.sleep(1)
+            attempts -= 1
+        else:
+            base_fee = latest_block['baseFeePerGas']
+            return float(round(web3.from_wei(base_fee, 'gwei'), 2))
+    return -1
 
 
-def get_nonce(address):
-    return web3.eth.get_transaction_count(web3.to_checksum_address(address))
+def get_nonce(address, attempts=18):
+    while attempts > 0:
+        try:
+            return web3.eth.get_transaction_count(web3.to_checksum_address(address))
+        except Exception as e:
+            logging.debug(e)
+            time.sleep(1)
+            attempts -= 1
+    return -1
 
 
-def get_pls_balance(address, decimals=False):
-    balance = web3.eth.get_balance(address)
-    if decimals:
-        return balance
-    else:
-        return from_token_decimals(balance, 18)
+def get_pls_balance(address, decimals=False, attempts=18):
+    while attempts > 0:
+        try:
+            balance = web3.eth.get_balance(address)
+        except Exception as e:
+            logging.debug(e)
+            time.sleep(1)
+            attempts -= 1
+        else:
+            if decimals:
+                return balance
+            else:
+                return from_token_decimals(balance, 18)
+    return -1
 
 
 def get_token_balance(token_address, wallet_address, decimals=False):
@@ -553,11 +610,10 @@ def mint_tokens(account, token_address, amount, attempts=18):
 
 
 def sample_exchange_rate(router_name, token_address, quote_address, attempts=18):
-    _attempts = attempts
-    while _attempts > 0:
+    while attempts > 0:
         token_result = estimate_swap_result(router_name, token_address, quote_address, 1)
         if len(token_result) == 0:
-            _attempts -= 1
+            attempts -= 1
             time.sleep(1)
             continue
         else:
