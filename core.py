@@ -343,36 +343,14 @@ def get_abi_from_blockscout(address, attempts=18):
 
 
 def get_average_gas_prices(average='median', tx_amount=100, attempts=18):
-    latest_block = None
-    _attempts = attempts
-    while _attempts > 0:
-        try:
-            latest_block = web3.eth.get_block('latest')['number']
-        except Exception as e:
-            logging.debug(e)
-            _attempts -= 1
-            time.sleep(1)
-        else:
-            break
-    if not latest_block:
+    if not (latest_block := get_block('latest', False, attempts)):
         return {}
+    else:
+        latest_block = latest_block['number']
     gas_limit = []
     gas_prices = []
     for block_number in range(latest_block, latest_block - tx_amount, -1):
-        block = None
-        _attempts = attempts
-        while _attempts > 0:
-            try:
-                block = web3.eth.get_block(block_number, full_transactions=True)
-            except BlockNotFound:
-                continue
-            except Exception as e:
-                logging.debug(e)
-                _attempts -= 1
-                time.sleep(1)
-            else:
-                break
-        if not block:
+        if not (block := get_block(block_number, True)):
             return {}
         for _tx in block['transactions']:
             gas_limit.append(_tx['gas'])
@@ -428,18 +406,25 @@ def get_beacon_gas_prices(speed=None, cache_interval_seconds=10):
     return {speed: float(web3.from_wei(price, 'gwei')) for speed, price in gas['data'].items() if speed in speeds}
 
 
-def get_last_block_base_fee(attempts=18):
+def get_block(number, full_transactions=False, attempts=18):
+    if type(number) is str and number not in ('latest',) and type(number) is not int:
+        raise ValueError("Invalid block number")
     while attempts > 0:
         try:
-            latest_block = web3.eth.get_block('latest')
+            return web3.eth.get_block(number, full_transactions=full_transactions)
         except Exception as e:
             logging.debug(e)
             time.sleep(1)
             attempts -= 1
-        else:
-            base_fee = latest_block['baseFeePerGas']
-            return float(round(web3.from_wei(base_fee, 'gwei'), 2))
-    return -1
+    return None
+
+
+def get_last_block_base_fee(attempts=18):
+    if latest_block := get_block('latest', False, attempts):
+        base_fee = latest_block['baseFeePerGas']
+        return float(round(web3.from_wei(base_fee, 'gwei'), 2))
+    else:
+        return -1
 
 
 def get_nonce(address, attempts=18):
