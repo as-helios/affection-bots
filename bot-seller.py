@@ -52,12 +52,6 @@ while True:
         else:
             logging.warning("Failed to send {} PLS to {}".format(send_to_wallet_b, wallet_b_address))
 
-    # check the current gas price
-    if get_beacon_gas_prices('rapid', beacon_gasnow_cache_seconds) > rapid_gas_fee_limit:
-        logging.warning("Gas fees are too high")
-        log_end_loop(loop_delay)
-        continue
-
     # take samples of 1 pdai/pusdc/affection to wpls price
     pdai_sample_result = sample_exchange_rate('PulseX_v2', pdai_address, wpls_address)
     pusdc_sample_result = sample_exchange_rate('PulseX_v2', pusdc_address, wpls_address)
@@ -82,6 +76,11 @@ while True:
         logging.info("Selling {} AFFECTION™...".format(sum(selling_amounts)))
         i = 0
         while i < len(selling_amounts):
+            # check the current gas price
+            if get_beacon_gas_prices('rapid', beacon_gasnow_cache_seconds) > rapid_gas_fee_limit:
+                logging.warning("Gas fees are too high")
+                log_end_loop(loop_delay)
+                continue
             amount = selling_amounts[i]
             # check if the pdai/pusdc price is cheaper than affection price
             if (pdai_sample_result < affection_sample_result
