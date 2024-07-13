@@ -5,6 +5,7 @@ import os
 import random
 import sys
 import time
+from json import JSONDecodeError
 from logging.handlers import TimedRotatingFileHandler
 from statistics import median, mean, mode
 
@@ -366,8 +367,10 @@ def get_beacon_gas_prices(speed=None, cache_interval_seconds=10):
     speeds = ('rapid', 'fast', 'standard', 'slow',)
     os.makedirs(cache_folder := './data/cache/', exist_ok=True)
     gas = {}
-    if os.path.isfile(gasnow_file := "{}/gasnow.json".format(cache_folder)):
-        gas = json.load(open(gasnow_file))
+    try:
+        gas = json.load(open(gasnow_file := "{}/gasnow.json".format(cache_folder)))
+    except (JSONDecodeError, FileNotFoundError):
+        pass
     if not gas or not gas['data'] or (gas['data']['timestamp'] / 1000) + cache_interval_seconds < time.time():
         try:
             r = requests.get('https://beacon.pulsechain.com/api/v1/execution/gasnow')
@@ -382,7 +385,7 @@ def get_beacon_gas_prices(speed=None, cache_interval_seconds=10):
                 return 5555 * 10 ** 369
             elif _gas['data']:
                 gas = _gas
-                open('./data/cache/gasnow.json', 'w').write(json.dumps(gas, indent=4))
+                open(gasnow_file, 'w').write(json.dumps(gas, indent=4))
     if type(speed) is str:
         try:
             return float(web3.from_wei(gas['data'][speed], 'gwei'))
