@@ -379,8 +379,9 @@ def get_beacon_gas_prices(speed=None, cache_interval_seconds=10):
     speeds = ('rapid', 'fast', 'standard', 'slow',)
     os.makedirs(cache_folder := './data/cache/', exist_ok=True)
     gas = {}
+    gasnow_file = "{}/gasnow.json".format(cache_folder)
     try:
-        gas = json.load(open(gasnow_file := "{}/gasnow.json".format(cache_folder)))
+        gas = json.load(open(gasnow_file))
     except (JSONDecodeError, FileNotFoundError):
         pass
     if not gas or not gas['data'] or (gas['data']['timestamp'] / 1000) + cache_interval_seconds < time.time():
