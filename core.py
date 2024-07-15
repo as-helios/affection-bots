@@ -43,7 +43,7 @@ def apply_estimated_gas(tx, attempts=18):
             return tx
 
 
-def apply_gas_multiplier(tx, multiplier=None, attempts=18):
+def apply_gas_multiplier(tx, multiplier=None):
     if not multiplier:
         multiplier = os.getenv('GAS_MULTIPLIER')
     try:
