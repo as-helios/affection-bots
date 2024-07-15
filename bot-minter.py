@@ -40,10 +40,10 @@ math11_info = get_token_info(math11_address)
 math11_contract = load_contract(math11_address)
 
 # load multi contract addresses
-multi_affection_address = '0x79474ff39B0F9Dc7d5F7209736C2a6913cf50F82'
-multi_math_1_1_address = '0x98375dA84C1493767De695Ee7Eef0BB522380A07'
-multi_g5_address = '0x5092aE511259E69e7D184fE69f4603108c143feF'
-multi_pi_address = '0x20c1DA6b3A2a3EA46a3c2CFeBB9Ac71E239d355A'
+multi_affection_address = '0x81fcd03D2100A0fE9767C0CfC68050bdc6a2969d'
+multi_math_1_1_address = '0x1322Dab9eE385Bb3D81f75EBb8356015B0872e53'
+multi_g5_address = '0xa4c61D20945c11855E7A390153fd29ceC9C7349b'
+multi_pi_address = '0xcCDaCEF154704c604365dB9E3b1DF356B9c4B6E2'
 
 while True:
     # log the wallet's pls balance
