@@ -128,7 +128,7 @@
     },
     "label": "AFFECTION™"
   },
-  "0x20c1DA6b3A2a3EA46a3c2CFeBB9Ac71E239d355A": {
+  "0xcCDaCEF154704c604365dB9E3b1DF356B9c4B6E2": {
     "functions": {
       "0x6B175474E89094C44Da98b954EedeAC495271d0F": "multiBuyWithDAI",
       "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": "#multiBuyWithUSDC",
@@ -143,7 +143,7 @@
     "mints": null,
     "max_iterations": 1000
   },
-  "0x5092aE511259E69e7D184fE69f4603108c143feF": {
+  "0xa4c61D20945c11855E7A390153fd29ceC9C7349b": {
     "functions": {
       "0x6B175474E89094C44Da98b954EedeAC495271d0F": "multiBuyWithDAI",
       "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": "#multiBuyWithUSDC",
@@ -158,7 +158,7 @@
     "mints": null,
     "max_iterations": 1000
   },
-  "0x1dC5095D7Eca30cd856a6C22Da13f52bc3a14Db0": {
+  "0x5bD78AdD4007C47ffEFc2c98a53188036199ac6f": {
     "functions": {
       "0x6B175474E89094C44Da98b954EedeAC495271d0F": "multiBuyWithDAI",
       "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": "multiBuyWithUSDC",
@@ -179,7 +179,7 @@
     "mints": 1,
     "max_iterations": 300
   },
-  "0x98375dA84C1493767De695Ee7Eef0BB522380A07": {
+  "0x1322Dab9eE385Bb3D81f75EBb8356015B0872e53": {
     "functions": {
       "0x6B175474E89094C44Da98b954EedeAC495271d0F": "multiBuyWithDAI",
       "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": "multiBuyWithUSDC",
@@ -200,7 +200,7 @@
     "mints": 1,
     "max_iterations": 300
   },
-  "0x79474ff39B0F9Dc7d5F7209736C2a6913cf50F82": {
+  "0x81fcd03D2100A0fE9767C0CfC68050bdc6a2969d": {
     "functions": {
       "0x2fc636E7fDF9f3E8d61033103052079781a6e7D2": "multiBuyWithG5",
       "0xB680F0cc810317933F234f67EB6A9E923407f05D": "multiBuyWithMATH",
