@@ -226,7 +226,8 @@ def convert_tokens_multi(account, multi_address, token0_address, token1_address,
 
     # get the cost required to convert tokens
     cost = routes_functions[multi_address]['costs'][token0_address]
-    tokens_cost = cost * iterations * routes_functions[multi_address]['mints']
+    mints = routes_functions[multi_address]['mints'] or 1
+    tokens_cost = cost * iterations * mints
     # python is so stupid sometimes
     try:
         decimal_places = len(str(cost).split('.')[1])
@@ -757,4 +758,3 @@ def wrap_pls(account, amount, attempts=18):
         if error := interpret_exception_message(e):
             logging.error("{} to wrap PLS".format(error))
         return False
-
