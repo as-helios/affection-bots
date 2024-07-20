@@ -96,13 +96,13 @@ while True:
     # convert pdai to pi
     logging.info("pDAI Balance: {:.15f}".format(pdai_balance := get_token_balance(pdai_address, wallet_b_address)))
     if (loops := math.floor(pdai_balance / 300)) != 0:
-        logging.info("Converting {} pDAI to PI...".format(loops))
+        logging.info("Converting {} pDAI to PI...".format(loops * 300))
         convert_tokens_multi(account, multi_pi_address, pdai_address, pi_address, loops)
 
     # convert pdai to g5
     pdai_balance = get_token_balance(pdai_address, wallet_b_address)
     if (loops := math.floor(pdai_balance / 5)) != 0:
-        logging.info("Converting {} pDAI to G5...".format(loops))
+        logging.info("Converting {} pDAI to G5...".format(loops * 5))
         convert_tokens_multi(account, multi_g5_address, pdai_address, g5_address, loops)
 
     # convert pdai to math1.1
@@ -119,4 +119,3 @@ while True:
 
     # wait before next loop
     log_end_loop(loop_delay)
-
