@@ -40,7 +40,7 @@ while True:
     send_to_wallet_b = float(round(pls_balance / 4, 2))
     # send the rest to buyer
     send_to_wallet_a = float(round(pls_balance - send_to_wallet_b, 2))
-    if pls_balance > wallet_min_pls:
+    if pls_balance > 0:
         # send pls to wallet a
         if send_pls(account, wallet_a_address, send_to_wallet_a):
             logging.info("Sent {} PLS to {}".format(send_to_wallet_a, wallet_a_address))
