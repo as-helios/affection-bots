@@ -84,7 +84,7 @@ while True:
             if get_beacon_gas_prices('rapid', beacon_gasnow_cache_seconds) > rapid_gas_fee_limit:
                 logging.warning("Gas fees are too high")
                 log_end_loop(loop_delay)
-                continue
+                break
             amount = selling_amounts[i]
             # check if the pdai/pusdc price is cheaper than affection price
             if (pdai_sample_result < affection_sample_result
