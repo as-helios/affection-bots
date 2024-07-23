@@ -554,7 +554,7 @@ def load_contract_abi(address):
 def load_wallet(address, secret):
     file_path = "./data/wallets/{}/keystore".format(address)
     if not os.path.exists(file_path):
-        raise FileNotFoundError
+        raise FileNotFoundError("Can't find your wallet keystore for address: {}".format(address))
     keystore = "\n".join([line.strip() for line in open(file_path, 'r+')])
     private_key = web3.eth.account.decrypt(keystore, secret)
     return web3.eth.account.from_key(private_key)
