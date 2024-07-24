@@ -85,7 +85,8 @@ while True:
                     'PulseX_v2',
                     [wpls_address, pdai_address],
                     estimated_swap_result,
-                    slippage_percent
+                    slippage_percent,
+                    wallet_b_address
                 ):
                     logging.info("Swapped {} PLS to pDAI".format(buy_with_amount_pls))
             else:
@@ -116,7 +117,8 @@ while True:
                     'PulseX_v2',
                     [wpls_address, pusdc_address],
                     estimated_swap_result,
-                    slippage_percent
+                    slippage_percent,
+                    wallet_b_address
                 ):
                     logging.info("Swapped {} PLS to pUSDC".format(buy_with_amount_pls))
             else:
