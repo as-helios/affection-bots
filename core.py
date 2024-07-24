@@ -667,7 +667,7 @@ def set_logging(filename='app', level='INFO', backup_count=7):
     raise Exception("Invalid logging level")
 
 
-def swap_tokens(account, router_name, token_route, estimated_swap_result, slippage_percent, taxed=False, attempts=18):
+def swap_tokens(account, router_name, token_route, estimated_swap_result, slippage_percent, to_address=None, taxed=False, attempts=18):
     routers = json.load(open('./data/routers.json'))
     router_contract = load_contract(routers[router_name][0], routers[router_name][1])
     approve_token_spending(account, token_route[0], routers[router_name][0], estimated_swap_result[0])
@@ -676,7 +676,7 @@ def swap_tokens(account, router_name, token_route, estimated_swap_result, slippa
             estimated_swap_result[0],
             estimated_swap_result[1] - round(estimated_swap_result[1] * (slippage_percent / 100)),
             token_route,
-            account.address,
+            to_address or account.address,
             int(time.time()) + (60 * 3)
         )
         tx_params = {
@@ -691,7 +691,7 @@ def swap_tokens(account, router_name, token_route, estimated_swap_result, slippa
         tx = swap_function(
             0,
             token_route,
-            account.address,
+            to_address or account.address,
             int(time.time()) + (60 * 3)
         )
         tx_params = {
@@ -708,7 +708,7 @@ def swap_tokens(account, router_name, token_route, estimated_swap_result, slippa
             estimated_swap_result[0],
             estimated_swap_result[1] - (estimated_swap_result[1] * slippage_percent),
             token_route,
-            account.address,
+            to_address or account.address,
             int(time.time()) + (60 * 3)
         )
         tx_params = {
