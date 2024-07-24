@@ -5,7 +5,8 @@ buy_percent_diff_pdai = 20
 buy_percent_diff_pusdc = 30
 buy_with_amount_pls = 30000
 slippage_percent = 5
-wallet_min_pls = 20000
+wallet_a_min_pls = 20000
+wallet_b_min_pls = 100000
 loop_delay = 3
 rapid_gas_fee_limit = 650000
 
@@ -21,7 +22,22 @@ wpls_address = '0xA1077a294dDE1B09bB078844df40758a5D0f9a27'
 
 while True:
     # log the wallet's pls balance
-    logging.info("PLS Balance: {:.15f}".format(get_pls_balance(account.address)))
+    pls_balance_a = get_pls_balance(account.address)
+    logging.info("PLS Balance: {:.15f}".format(pls_balance_a))
+
+    # check if wallet b has a minimum amount of pls and send some back for minting
+    pls_balance_b = get_pls_balance(wallet_b_address)
+    if pls_balance_b - wallet_b_min_pls < 0:
+        send_to_wallet_b = math.ceil(wallet_b_min_pls - pls_balance_b)
+        logging.info("Minter needs {} PLS".format(send_to_wallet_b))
+        # check if sending pls to wallet b leaves wallet a with enough left over
+        if send_to_wallet_b < (pls_balance_a - wallet_a_min_pls):
+            if send_pls(account, wallet_b_address, send_to_wallet_b):
+                logging.info("Sent {} PLS to {}".format(send_to_wallet_b, wallet_b_address))
+            else:
+                logging.warning("Failed to send {} PLS to {}".format(send_to_wallet_b, wallet_b_address))
+        else:
+            logging.info("Not enough PLS to send right now")
 
     # if wallet has at least 1 pdai token send it to the minter
     if (pdai_balance := get_token_balance(pdai_address, wallet_a_address)) > 1:
@@ -55,10 +71,10 @@ while True:
 
     # keep a minimum pls balance in the bot
     skip = False
-    if (pls_balance := get_pls_balance(wallet_a_address)) < wallet_min_pls:
+    if (pls_balance := get_pls_balance(wallet_a_address)) < wallet_a_min_pls:
         logging.warning("PLS balance is below minimum")
         skip = True
-    elif pls_balance < buy_with_amount_pls + wallet_min_pls:
+    elif pls_balance < buy_with_amount_pls + wallet_a_min_pls:
         logging.warning("Buying would put the PLS balance below minimum")
         skip = True
     if skip:

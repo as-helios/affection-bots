@@ -33,25 +33,6 @@ while True:
     # log the wallet's pls balance
     logging.info("PLS Balance: {:.15f}".format(get_pls_balance(account.address)))
 
-    # send pls back to wallet a for buying
-    pls_balance = get_pls_balance(account.address, False)
-    pls_balance -= wallet_min_pls
-    # send the minter 1/4
-    send_to_wallet_b = float(round(pls_balance / 4, 2))
-    # send the rest to buyer
-    send_to_wallet_a = float(round(pls_balance - send_to_wallet_b, 2))
-    if pls_balance > 0:
-        # send pls to wallet a
-        if send_pls(account, wallet_a_address, send_to_wallet_a):
-            logging.info("Sent {} PLS to {}".format(send_to_wallet_a, wallet_a_address))
-        else:
-            logging.warning("Failed to send {} PLS to {}".format(send_to_wallet_a, wallet_a_address))
-        # send pls to wallet b
-        if send_pls(account, wallet_b_address, send_to_wallet_b):
-            logging.info("Sent {} PLS to {}".format(send_to_wallet_b, wallet_b_address))
-        else:
-            logging.warning("Failed to send {} PLS to {}".format(send_to_wallet_b, wallet_b_address))
-
     # take samples of 1 pdai/pusdc/affection to wpls price
     pdai_sample_result = sample_exchange_rate('PulseX_v2', pdai_address, wpls_address)
     pusdc_sample_result = sample_exchange_rate('PulseX_v2', pusdc_address, wpls_address)
