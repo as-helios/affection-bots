@@ -106,7 +106,8 @@ while True:
                                 'PulseX_v2',
                                 [affection_address, wpls_address],
                                 estimated_swap_result,
-                                slippage_percent
+                                slippage_percent,
+                                wallet_a_address
                         ):
                             logging.info("Swapped {} AFFECTION™ to PLS".format(amount))
                             i += 1
