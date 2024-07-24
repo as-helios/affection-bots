@@ -3,7 +3,7 @@ from core import *
 # set config variables
 wallet_min_pls = 20000
 loop_delay = 3
-rapid_gas_fee_limit = 600000
+rapid_gas_fee_limit = 450000
 
 # load wallet B and set address for logging
 set_logging(wallet_b_address, 'INFO')
