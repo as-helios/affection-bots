@@ -3,7 +3,7 @@ from core import *
 # set config variables
 sell_percent_diff_pdai = 15
 sell_percent_diff_pusdc = 25
-sell_with_amount_affection = 200
+sell_with_amount_affection = 500
 slippage_percent = 5
 wallet_min_pls = 20000
 loop_delay = 3
