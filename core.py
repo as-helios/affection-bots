@@ -252,7 +252,7 @@ def convert_tokens_multi(account, multi_address, token0_address, token1_address,
         if get_beacon_gas_prices('rapid', beacon_gasnow_cache_seconds) > rapid_gas_fee_limit:
             logging.warning("Gas fees are too high")
             return None
-        if i + 1 < loops or iterations == routes_functions[multi_address]['max_iterations']:
+        if i + 1 < loops or iterations % routes_functions[multi_address]['max_iterations'] == 0:
             # do max iterations during loop
             call_iterations = routes_functions[multi_address]['max_iterations']
         else:
