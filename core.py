@@ -228,14 +228,7 @@ def convert_tokens_multi(account, multi_address, token0_address, token1_address,
     cost = routes_functions[multi_address]['costs'][token0_address]
     mints = routes_functions[multi_address]['mints'] or 1
     tokens_cost = cost * iterations * mints
-    # python is so stupid sometimes
-    try:
-        decimal_places = len(str(cost).split('.')[1])
-        decimal_places = decimal_places if decimal_places <= 15 else 15
-    except (AttributeError, IndexError):
-        tokens_required = tokens_cost
-    else:
-        tokens_required = float(round(tokens_cost, decimal_places))
+    tokens_required = round(tokens_cost, 15)
 
     # check if the wallet has enough tokens to convert
     if tokens_required > (tokens_balance := get_token_balance(token0_address, account.address)):
