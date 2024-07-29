@@ -39,16 +39,6 @@ while True:
         else:
             logging.info("Not enough PLS to send right now")
 
-    # if wallet has at least 1 pdai token send it to the minter
-    if (pdai_balance := get_token_balance(pdai_address, wallet_a_address)) > 1:
-        if tx := send_tokens(account, pdai_address, wallet_b_address, pdai_balance):
-            logging.info("Sent {} pDAI to {}".format(pdai_balance, wallet_b_address))
-
-    # if wallet has at least 1 usdc token send it to the minter
-    if (pusdc_balance := get_token_balance(pusdc_address, wallet_a_address)) > 1:
-        if tx := send_tokens(account, pusdc_address, wallet_b_address, pusdc_balance):
-            logging.info("Sent {} pUSDC to {}".format(pusdc_balance, wallet_b_address))
-
     # check the current gas price
     if get_beacon_gas_prices('rapid', beacon_gasnow_cache_seconds) > rapid_gas_fee_limit:
         logging.warning("Gas fees are too high")
