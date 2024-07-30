@@ -7,6 +7,7 @@ buy_with_amount_pls = 30000
 slippage_percent = 5
 wallet_a_min_pls = 20000
 wallet_b_min_pls = 100000
+wallet_c_min_pls = 20000
 loop_delay = 3
 rapid_gas_fee_limit = 650000
 
@@ -36,6 +37,20 @@ while True:
                 logging.info("Sent {} PLS to {}".format(send_to_wallet_b, wallet_b_address))
             else:
                 logging.warning("Failed to send {} PLS to {}".format(send_to_wallet_b, wallet_b_address))
+        else:
+            logging.info("Not enough PLS to send right now")
+
+    # check if wallet c has a minimum amount of pls and send some back for selling
+    pls_balance_c = get_pls_balance(wallet_c_address)
+    if pls_balance_c - wallet_c_min_pls < 0:
+        send_to_wallet_c = math.ceil(wallet_c_min_pls - pls_balance_c)
+        logging.info("Seller needs {} PLS".format(send_to_wallet_c))
+        # check if sending pls to wallet c leaves wallet a with enough left over
+        if send_to_wallet_c < (pls_balance_a - wallet_a_min_pls):
+            if send_pls(account, wallet_c_address, send_to_wallet_c):
+                logging.info("Sent {} PLS to {}".format(send_to_wallet_c, wallet_c_address))
+            else:
+                logging.warning("Failed to send {} PLS to {}".format(send_to_wallet_c, wallet_c_address))
         else:
             logging.info("Not enough PLS to send right now")
 
