@@ -50,7 +50,7 @@ while True:
     logging.info("PLS Balance: {:.15f}".format(pls_balance := get_pls_balance(account.address)))
 
     # transfer affection
-    logging.info("AFFECTION™ Balance: {:.15f}".format(affection_balance := float(round(get_token_balance(affection_address, wallet_b_address), 2))))
+    logging.info("AFFECTION™ Balance: {:.15f}".format(affection_balance := math.floor(get_token_balance(affection_address, wallet_b_address))))
     if affection_balance > 1:
         # send affection tokens to wallet C for selling
         if send_tokens(account, affection_address, wallet_c_address, affection_balance):
@@ -87,7 +87,7 @@ while True:
         convert_tokens_multi(account, multi_affection_address, math11_address, affection_address, loops)
 
     # transfer affection
-    logging.info("AFFECTION™ Balance: {:.15f}".format(affection_balance := float(round(get_token_balance(affection_address, wallet_b_address), 2))))
+    logging.info("AFFECTION™ Balance: {:.15f}".format(affection_balance := math.floor(get_token_balance(affection_address, wallet_b_address))))
     if affection_balance > 1:
         # send affection tokens to wallet C for selling
         if send_tokens(account, affection_address, wallet_c_address, affection_balance):
