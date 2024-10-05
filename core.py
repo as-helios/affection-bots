@@ -381,15 +381,19 @@ async def estimate_mempool_gas_prices():
     if not gas_prices:
         return None
     gas_prices.sort()
-    slow = gas_prices[int(len(gas_prices) * 0.2)]  # 20th percentile
-    standard = gas_prices[int(len(gas_prices) * 0.3)]  # 30th percentile
-    fast = gas_prices[int(len(gas_prices) * 0.5)]  # 50th percentile (median)
-    rapid = gas_prices[int(len(gas_prices) * 0.8)]  # 80th percentile
+    very_slow = gas_prices[int(len(gas_prices) * 0.1)]  # 10th percentile
+    slow = gas_prices[int(len(gas_prices) * 0.25)]  # 25th percentile
+    standard = gas_prices[int(len(gas_prices) * 0.5)]  # 50th percentile (median)
+    fast = gas_prices[int(len(gas_prices) * 0.70)]  # 70th percentile
+    rapid = gas_prices[int(len(gas_prices) * 0.80)]  # 80th percentile
+    instant = gas_prices[int(len(gas_prices) * 0.90)]  # 90th percentile
     return {
+        'very_slow': float(round(very_slow, 2)),
         'slow': float(round(slow, 2)),
         'standard': float(round(standard, 2)),
         'fast': float(round(fast, 2)),
         'rapid': float(round(rapid, 2)),
+        'instant': float(round(instant, 2)),
         'avg': float(round(mean(gas_prices), 2)),
         'median': float(round(median(gas_prices), 2)),
         'lowest': float(round(min(gas_prices), 2)),
