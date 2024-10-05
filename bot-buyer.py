@@ -55,7 +55,7 @@ while True:
             logging.info("Not enough PLS to send right now")
 
     # check the current gas price
-    if get_beacon_gas_prices('rapid', beacon_gasnow_cache_seconds) > rapid_gas_fee_limit:
+    if get_mempool_gas_prices('rapid', gas_cache_seconds) > rapid_gas_fee_limit:
         logging.warning("Gas fees are too high")
         log_end_loop(loop_delay)
         continue

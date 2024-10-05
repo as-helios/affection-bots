@@ -5,6 +5,7 @@ import os
 import random
 import sys
 import time
+import asyncio
 from json import JSONDecodeError
 from logging.handlers import TimedRotatingFileHandler
 from statistics import median, mean, mode
@@ -24,11 +25,10 @@ web3 = Web3(MultiProvider(json.load(open('./data/rpc_servers.json'))))
 
 gas_multiplier = float(os.getenv('GAS_MULTIPLIER'))
 rapid_gas_fee_limit = int(os.getenv('GAS_FEE_RAPID_LIMIT'))
-beacon_gasnow_cache_seconds = int(os.getenv('BEACON_GASNOW_CACHE_SECONDS'))
+gas_cache_seconds = int(os.getenv('GAS_CACHE_SECONDS'))
 wallet_a_address = os.getenv('WALLET_A_ADDRESS')
 wallet_b_address = os.getenv('WALLET_B_ADDRESS')
 wallet_c_address = os.getenv('WALLET_C_ADDRESS')
-
 
 def apply_estimated_gas(tx, attempts=18):
     while attempts > 0:
@@ -162,7 +162,7 @@ def convert_tokens(account, token0_address, token1_address, output_amount, attem
         if 'positional arguments with type(s) `int`' in str(e):
             for i in range(0, amount):
                 # cancel the rest of this loop if the gas price is too damn high
-                if get_beacon_gas_prices('rapid', beacon_gasnow_cache_seconds) > rapid_gas_fee_limit:
+                if get_mempool_gas_prices('rapid', gas_cache_seconds) > rapid_gas_fee_limit:
                     logging.warning("Gas fees are too high")
                     return None
                 try:
@@ -242,7 +242,7 @@ def convert_tokens_multi(account, multi_address, token0_address, token1_address,
     # start calling multi mints
     for i in list(range(0, loops)):
         # cancel the rest of this loop if the gas price is too damn high
-        if get_beacon_gas_prices('rapid', beacon_gasnow_cache_seconds) > rapid_gas_fee_limit:
+        if get_mempool_gas_prices('rapid', gas_cache_seconds) > rapid_gas_fee_limit:
             logging.warning("Gas fees are too high")
             return None
         if i + 1 < loops or iterations % routes_functions[multi_address]['max_iterations'] == 0:
@@ -369,36 +369,65 @@ def get_average_gas_prices(average='median', tx_amount=100, attempts=18):
     }
 
 
-def get_beacon_gas_prices(speed=None, cache_interval_seconds=10):
+
+async def estimate_mempool_gas_prices():
+    pending = web3.eth.get_block('pending', full_transactions=True)
+    gas_prices = []
+    for tx in pending['transactions']:
+        if 'maxFeePerGas' in tx:
+            gas_prices.append(web3.from_wei(tx['maxFeePerGas'], 'gwei'))
+        elif 'gasPrice' in tx:
+            gas_prices.append(web3.from_wei(tx['gasPrice'], 'gwei'))
+    if not gas_prices:
+        return None
+    gas_prices.sort()
+    slow = gas_prices[int(len(gas_prices) * 0.2)]  # 20th percentile
+    standard = gas_prices[int(len(gas_prices) * 0.3)]  # 30th percentile
+    fast = gas_prices[int(len(gas_prices) * 0.5)]  # 50th percentile (median)
+    rapid = gas_prices[int(len(gas_prices) * 0.8)]  # 80th percentile
+    return {
+        'slow': float(round(slow, 2)),
+        'standard': float(round(standard, 2)),
+        'fast': float(round(fast, 2)),
+        'rapid': float(round(rapid, 2)),
+        'avg': float(round(mean(gas_prices), 2)),
+        'median': float(round(median(gas_prices), 2)),
+        'lowest': float(round(min(gas_prices), 2)),
+        'highest': float(round(max(gas_prices), 2)),
+        'tx_count': len(gas_prices),
+        'timestamp': time.time()
+    }
+
+def get_mempool_gas_prices(speed=None, cache_interval_seconds=10):
     speeds = ('rapid', 'fast', 'standard', 'slow',)
     os.makedirs(cache_folder := './data/cache/', exist_ok=True)
     gas = {}
-    gasnow_file = "{}/gasnow.json".format(cache_folder)
+    gas_file = "{}/mempool_gas.json".format(cache_folder)
+
     try:
-        gas = json.load(open(gasnow_file))
+        gas = json.load(open(gas_file))
     except (JSONDecodeError, FileNotFoundError):
         pass
-    if not gas or not gas['data'] or (gas['data']['timestamp'] / 1000) + cache_interval_seconds < time.time():
+    if not gas or not gas['timestamp'] or (gas['timestamp'] + cache_interval_seconds < time.time()):
         try:
-            r = requests.get('https://beacon.pulsechain.com/api/v1/execution/gasnow')
-            _gas = r.json()
+            _gas = asyncio.run(estimate_mempool_gas_prices())
         except Exception as e:
-            if not gas or not gas['data']:
+            if not gas:
                 logging.debug(e)
                 return 5555 * 10 ** 369
         else:
             if not _gas and not gas:
-                logging.debug("No gas data returned from GasNow API endpoint")
+                logging.debug("No gas data")
                 return 5555 * 10 ** 369
-            elif _gas['data']:
+            elif _gas:
                 gas = _gas
-                open(gasnow_file, 'w').write(json.dumps(gas, indent=4))
+                open(gas_file, 'w').write(json.dumps(gas, indent=4))
     if type(speed) is str:
         try:
-            return float(web3.from_wei(gas['data'][speed], 'gwei'))
+            return float(gas[speed])
         except KeyError:
             raise KeyError("No such speed as '{}' in gas price data {}".format(speed, list(speeds)))
-    return {speed: float(web3.from_wei(price, 'gwei')) for speed, price in gas['data'].items() if speed in speeds}
+    return {speed: float(price) for speed, price in gas.items() if speed in speeds}
 
 
 def get_block(number, full_transactions=False, attempts=18):
